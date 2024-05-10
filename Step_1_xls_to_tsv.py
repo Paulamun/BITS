@@ -10,8 +10,6 @@ subHDs00= ["028", "033", "021", "015", "062", "020", "024", "027", "030", "055",
 subHDs00= ["028", "033", "021", "015", "062", "020", "024", "027", "030", "055", "056", "057", "063", "054", "039", "040", "031", "042", "014", "026"]
 subHDs01= ["028", "033", "021", "015", "020", "024", "027", "030", "014", "026"]
 
-# AP - commented out lists for BITS above
-# and below
 
 #LOOP TO CONVERT xls.files In  tsv. FILES
 
@@ -33,8 +31,6 @@ for x in subHCs01:
 
 	np.savetxt(filename, newvar,delimiter="\t",fmt='%s')
 
-
-# AP - is there a reason this single for loop reads in run-00 while the others read in run-01? If there are two runs (everyone has run-00 and run-01) that is HUGE benefit statistically and we should be using both. It's likely to be more beneficial than having 2x the number of subejects.
 
 for x in subHDs00:
 	filepath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/Task_xls/GoNoGoTaskBaselineHD/GoNoGo' + x + '-1B.xls'
