@@ -66,85 +66,85 @@ import re
 #         "go": df[df["trial"] == "go"],
 #     }
 
-def format_simon(fp, subject, shift_onset):
-    df = pd.read_excel(fp, header=None)
+#def format_simon(fp, subject, shift_onset):
+#   df = pd.read_excel(fp, header=None)
     # remove unwanted contents from the top rows
-    row_start = df[df.loc[:, 2].notna()].index[0]
-    df = df.iloc[row_start:, :].reset_index(drop=True)
-    df.columns = df.iloc[0]
-    df = df.drop(0).reset_index(drop=True)
-    # if not 55 trials throw an error message
-    if len(df)!= 55:
-        print(f"\nError: {fp} doesn't have the correct trial numbers!")
-        return
-    if "t" in df["Stimulus.RESP"]:
-        print(f"\nError: {fp} has response 't'!")
-        return
+#    row_start = df[df.loc[:, 2].notna()].index[0]
+#    df = df.iloc[row_start:, :].reset_index(drop=True)
+#    df.columns = df.iloc[0]
+#    df = df.drop(0).reset_index(drop=True)
+#    # if not 55 trials throw an error message
+#    if len(df)!= 55:
+#        print(f"\nError: {fp} doesn't have the correct trial numbers!")
+#        return
+#    if "t" in df["Stimulus.RESP"]:
+#        print(f"\nError: {fp} has response 't'!")
+#        return
     # check for df["Subject"] to make sure it's the subject's eprime data
-    if str(df.Subject[0]) not in re.findall(r'\d+', subject)[0]:
-        print(f"\nError: {fp} is not the e-prime file for {subject}")
-        return
+#    if str(df.Subject[0]) not in re.findall(r'\d+', subject)[0]:
+#        print(f"\nError: {fp} is not the e-prime file for {subject}")
+#        return
     # remove blank trials as they are not modelled at all
-    blank_trials = df[df['Blank'] == 1].index
-    df = df.drop(blank_trials).reset_index(drop=True)
-    if len(df)!= 44:
-        print(f"\nError: {fp} doesn't have the correct non-blank trial numbers!")
-        return
+#    blank_trials = df[df['Blank'] == 1].index
+#    df = df.drop(blank_trials).reset_index(drop=True)
+#    if len(df)!= 44:
+#        print(f"\nError: {fp} doesn't have the correct non-blank trial numbers!")
+#        return
     # modify response: 2->1, 3->2
-    if 3 in df["Stimulus.RESP"]:
-        df.loc[df["Stimulus.RESP"] == 2, "Stimulus.RESP"] = 1
-        df.loc[df["Stimulus.RESP"] == 3, "Stimulus.RESP"] = 2
+#    if 3 in df["Stimulus.RESP"]:
+#        df.loc[df["Stimulus.RESP"] == 2, "Stimulus.RESP"] = 1
+#        df.loc[df["Stimulus.RESP"] == 3, "Stimulus.RESP"] = 2
     # modify accuracy for subjects with backwards instructions
-    backwards_subject_s0 = ["MKET002", "MKET008", "MKET009", "MKET012", "MKET014", "MKET015", "MKET016"]
-    if subject in backwards_subject_s0:
+#    backwards_subject_s0 = ["MKET002", "MKET008", "MKET009", "MKET012", "MKET014", "MKET015", "MKET016"]
+#    if subject in backwards_subject_s0:
         # modify stimulation types for backwards instructed subjects
-        df[['IncongruentListLeft', 'IncongruentListRight', 'CongruentListLeft', 'CongruentListRight']] \
-            = df[['CongruentListRight', 'CongruentListLeft', 'IncongruentListRight', 'IncongruentListLeft']]
+#        df[['IncongruentListLeft', 'IncongruentListRight', 'CongruentListLeft', 'CongruentListRight']] \
+#            = df[['CongruentListRight', 'CongruentListLeft', 'IncongruentListRight', 'IncongruentListLeft']]
         # modify accuracy accordingly
-        df["Stimulus.RESP"] = 3 - df["Stimulus.RESP"]
+#        df["Stimulus.RESP"] = 3 - df["Stimulus.RESP"]
     # modify accuracy for subjects with updated response
-    df.loc[df['CorrectAnswer'] == df["Stimulus.RESP"], 'Stimulus.ACC'] = 1
-    df.loc[df['CorrectAnswer'] != df["Stimulus.RESP"], 'Stimulus.ACC'] = 0
+#    df.loc[df['CorrectAnswer'] == df["Stimulus.RESP"], 'Stimulus.ACC'] = 1
+#    df.loc[df['CorrectAnswer'] != df["Stimulus.RESP"], 'Stimulus.ACC'] = 0
     # summarize incongruent and congruent trials
-    df['IncongruentList'] = df.loc[:, ['IncongruentListLeft', 'IncongruentListRight']].sum(axis=1, min_count=1)
-    df['CongruentList'] = df.loc[:, ['CongruentListLeft', 'CongruentListRight']].sum(axis=1, min_count=1)
-    df.loc[df['IncongruentList'] == 1, 'StimVar'] = 'Incongruent'
-    df.loc[df['CongruentList'] == 1, 'StimVar'] = 'Congruent'
+#    df['IncongruentList'] = df.loc[:, ['IncongruentListLeft', 'IncongruentListRight']].sum(axis=1, min_count=1)
+#    df['CongruentList'] = df.loc[:, ['CongruentListLeft', 'CongruentListRight']].sum(axis=1, min_count=1)
+#    df.loc[df['IncongruentList'] == 1, 'StimVar'] = 'Incongruent'
+#    df.loc[df['CongruentList'] == 1, 'StimVar'] = 'Congruent'
 
     # generate preceding incongruent and congruent trials
-    df['IncongruentPriorList'] = (df['IncongruentList']).shift(1, axis=0)
-    df['CongruentPriorList'] = (df['CongruentList']).shift(1, axis=0)
+#    df['IncongruentPriorList'] = (df['IncongruentList']).shift(1, axis=0)
+#    df['CongruentPriorList'] = (df['CongruentList']).shift(1, axis=0)
 
     # generate trial types for modeling
     # 1. CORRECT congruent preceded by congruent (cC)
-    cC = df[(df['Stimulus.ACC'] == 1) & (df['CongruentList'] == 1) & (df['CongruentPriorList'] == 1)].index
-    df.loc[cC, 'trial_type'] = 'cC'
+#    cC = df[(df['Stimulus.ACC'] == 1) & (df['CongruentList'] == 1) & (df['CongruentPriorList'] == 1)].index
+#    df.loc[cC, 'trial_type'] = 'cC'
     # 2. CORRECT congruent preceded by incongruent (iC)
-    iC = df[(df['Stimulus.ACC'] == 1) & (df['CongruentList'] == 1) & (df['IncongruentPriorList'] == 1)].index
-    df.loc[iC, 'trial_type'] = 'iC'
+#    iC = df[(df['Stimulus.ACC'] == 1) & (df['CongruentList'] == 1) & (df['IncongruentPriorList'] == 1)].index
+#    df.loc[iC, 'trial_type'] = 'iC'
     # 3. CORRECT incongruent preceded by congruent (cI)
-    cI = df[(df['Stimulus.ACC'] == 1) & (df['IncongruentList'] == 1) & (df['CongruentPriorList'] == 1)].index
-    df.loc[cI, 'trial_type'] = 'cI'
+#    cI = df[(df['Stimulus.ACC'] == 1) & (df['IncongruentList'] == 1) & (df['CongruentPriorList'] == 1)].index
+#    df.loc[cI, 'trial_type'] = 'cI'
     # 4. CORRECT incongruent preceded by incongruent (iI)
-    iI = df[(df['Stimulus.ACC'] == 1) & (df['IncongruentList'] == 1) & (df['IncongruentPriorList'] == 1)].index
-    df.loc[iI, 'trial_type'] = 'iI'
+#    iI = df[(df['Stimulus.ACC'] == 1) & (df['IncongruentList'] == 1) & (df['IncongruentPriorList'] == 1)].index
+#    df.loc[iI, 'trial_type'] = 'iI'
     # 5. All incorrect
-    df.loc[((df['Stimulus.ACC'] == 0) | ((df['Stimulus.RT'] > 0) & (df['Stimulus.RT'] < 200))), 'trial_type'] = 'aI'
+#    df.loc[((df['Stimulus.ACC'] == 0) | ((df['Stimulus.RT'] > 0) & (df['Stimulus.RT'] < 200))), 'trial_type'] = 'aI'
     # 6. first trial
-    df.loc[0, 'trial_type'] = 'ft'
+#    df.loc[0, 'trial_type'] = 'ft'
 
     # rename columns in df
-    df['onset'] = df['NewStimOnsetTime']/1000.0 - shift_onset
-    df['duration'] = df['Stimulus.Duration']/1000.0
-    df['response_time'] = df['Stimulus.RT']/1000.0
-    df['trial_num'] = df['Trial']
-    df['correctness'] = df['Stimulus.ACC']
-    dfs = df[["onset", "duration", "trial_type", "response_time", "correctness", "StimVar", "trial_num"]]
+#    df['onset'] = df['NewStimOnsetTime']/1000.0 - shift_onset
+#    df['duration'] = df['Stimulus.Duration']/1000.0
+#    df['response_time'] = df['Stimulus.RT']/1000.0
+#    df['trial_num'] = df['Trial']
+#    df['correctness'] = df['Stimulus.ACC']
+#    dfs = df[["onset", "duration", "trial_type", "response_time", "correctness", "StimVar", "trial_num"]]
     # check if nan exists
-    if dfs.isnull().values.any():
-        print(f"\nError: {fp} has trials which can not be recognized correctly!")
-        return
-    return dfs
+#    if dfs.isnull().values.any():
+#        print(f"\nError: {fp} has trials which can not be recognized correctly!")
+#        return
+#    return dfs
 
 
 
