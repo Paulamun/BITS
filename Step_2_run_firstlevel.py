@@ -1,6 +1,6 @@
-addpath (genpath('/home/users/paulamun/230502_JP_Paula_GoNoGo_level1/'))
+addpath (genpath('/oak/stanford/groups/leanew1/BITS/'))
+addpath (genpath('/oak/stanford/groups/leanew1/BITS/Step_1.5_Function_for_Step_2'))
 
-addpath (genpath('/oak/stanford/groups/leanew1/users/paulamun/'))
 
 fmriprep_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/derivatives/fmriprep-20.2.3/fmriprep';
 bidsinput_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input';
