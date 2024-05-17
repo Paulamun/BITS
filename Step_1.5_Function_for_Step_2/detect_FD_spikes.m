@@ -1,6 +1,4 @@
-#detect_FD_spikes (week 18 version)
-
-# AP - function [not_complete] suggests maybe this isn't the one that we ended up using? lmk if I should just ignore than
+#detect_FD_spikes
 
 function [not_complete] = detect_FD_spikes(func_dir, spike_thresh)
 not_complete = 0;
