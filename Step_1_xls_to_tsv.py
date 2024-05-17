@@ -1,5 +1,5 @@
-from generate_onset import format_gonogo
-from generate_onset import format_gonogotsv
+from generate_onset_1 import format_gonogo
+from generate_onset_1 import format_gonogotsv
 import numpy as np
 # convert xls files from box to tsv for analysis
 
