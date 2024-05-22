@@ -16,40 +16,51 @@ subHDs01= ["028", "033", "021", "015", "020", "024", "027", "030", "014", "026"]
 
 for x in subHCs00:
 	filepath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/Task_xls/GoNoGoTaskBaselineHC/GoNoGo' + x + 'B.xls'
-	filename = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/func/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.tsv'
+	outputpath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo'
+	filenametsv = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.tsv'
+	filenametxt = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.txt'
 	subname = 'BITS' + x
 	newvar = format_gonogo(filepath, subname, 0.2)
-	newvar.to_csv(filename, sep="\t", index=False)
+	os.mkdir(outputpath)
+	newvar.to_csv(filenametsv, sep="\t", index=False)
 
-	np.savetxt(filename, newvar,delimiter="\t",fmt='%s')
+	np.savetxt(filenametxt, newvar,delimiter="\t",fmt='%s')
 
 for x in subHCs01:
 	filepath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/Task_xls/GoNoGoTaskWeek18HC/GoNoGo' + x + 'W.xls'
-	filename = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/func/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.tsv'
+	outputpath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo'
+	filenametsv = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.tsv'
+	filenametxt = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.txt'
 	subname = 'BITS' + x
 	newvar = format_gonogo(filepath, subname, 0.2)
-	newvar.to_csv(filename, sep="\t", index=False)
+	os.mkdir(outputpath)
+	newvar.to_csv(filenametsv, sep="\t", index=False)
 
-	np.savetxt(filename, newvar,delimiter="\t",fmt='%s')
-
+	np.savetxt(filenametxt, newvar,delimiter="\t",fmt='%s')
 
 for x in subHDs00:
 	filepath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/Task_xls/GoNoGoTaskBaselineHD/GoNoGo' + x + '-1B.xls'
-	filename = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/func/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.tsv'
+	outputpath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo'
+	filenametsv = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.tsv'
+	filenametxt = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s0/git_gonogo/sub-BITS' + x + '_ses_s0_task-gonogo_run-00_events.txt'
 	subname = 'BITS' + x
 	newvar = format_gonogo(filepath, subname, 0.2)
-	newvar.to_csv(filename, sep="\t", index=False)
+	os.mkdir(outputpath)
+	newvar.to_csv(filenametsv, sep="\t", index=False)
 
-	np.savetxt(filename, newvar,delimiter="\t",fmt='%s')
+	np.savetxt(filenametxt, newvar,delimiter="\t",fmt='%s')
 
 for x in subHDs01:
 	filepath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/Task_xls/GoNoGoTaskWeek18HD/GoNoGo' + x + '-2W.xls'
-	filename = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/func/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.tsv'
+	outputpath = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo'
+	filenametsv = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.tsv'
+	filenametxt = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-BITS' + x + '/ses-s1/git_gonogo/sub-BITS' + x + '_ses_s1_task-gonogo_run-00_events.txt'
 	subname = 'BITS' + x
 	newvar = format_gonogo(filepath, subname, 0.2)
-	newvar.to_csv(filename, sep="\t", index=False)
+	os.mkdir(outputpath)
+	newvar.to_csv(filenametsv, sep="\t", index=False)
 
-	np.savetxt(filename, newvar,delimiter="\t",fmt='%s')
+	np.savetxt(filenametxt, newvar,delimiter="\t",fmt='%s')
 
 # AP specific loop. Connectome PTs
 subsHCP=["CONN067"]
