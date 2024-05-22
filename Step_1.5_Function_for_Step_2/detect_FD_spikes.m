@@ -1,5 +1,3 @@
-detect_FD_spikes
-
 function [not_complete] = detect_FD_spikes(func_dir, spike_thresh)
 not_complete = 0;
 for run = 0
