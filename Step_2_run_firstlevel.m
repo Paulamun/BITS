@@ -6,11 +6,11 @@ fmriprep_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/d
 bidsinput_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input';
 model_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/';
 
-mask = ['/oak/stanford/groups/leanew1/BITS/BrainMask_05_91x109x91.img'];
+mask = ['/oak/stanford/groups/leanew1/BITS/mask/BrainMask_05_91x109x91.img'];
 
 subject_all = {'BITS045'};
 
-session_all = {'s1'};
+session_all = {'s0'};
 for isub = 1: length(subject_all)
 TR = 2; nsclices = 32; spike_thresh = 0.25;
     subject = subject_all{isub};
@@ -24,7 +24,7 @@ TR = 2; nsclices = 32; spike_thresh = 0.25;
             continue
         end
        
-        onset_dir = fullfile(['/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-' subject '/ses-' session '/func/']);
+        onset_dir = fullfile(['/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/sub-' subject '/ses-' session '/git_gonogo/']);
         out_dir = fullfile(model_dir, ['sub-', subject], ['ses-', session], 'gonogo', 'activation')
        
         not_complete_func = prep_func(func_dir); 
