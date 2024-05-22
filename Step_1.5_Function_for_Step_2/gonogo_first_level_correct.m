@@ -1,6 +1,3 @@
-gonogo_first_level_correct (Week 18)
-
-
 function gonogo_first_level_correct(out_dir, TR, mask, nsclices) 
 %-----------------------------------------------------------------------
 % Job configuration created by cfg_util (rev $Rev: 4252 $)
