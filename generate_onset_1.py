@@ -1,9 +1,7 @@
-
 import os
 import numpy as np
 import pandas as pd
 from glob import glob
-from tqdm import tqdm
 from os.path import basename, dirname, isdir, isfile, join
 import re
 
