@@ -1,5 +1,3 @@
-generate_FD_regressors (week18)
-
 function generate_FD_regressors(func_dir, out_dir)
 %% get nuisance regressors: motion spikes, 12 motion regressors, 
 %% non-steady state regressor, and top 5 compcor regressors
