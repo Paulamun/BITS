@@ -40,7 +40,7 @@ if ~exist(fullfile(spmdir, 'con_0003.nii'), 'file')
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).duration = dur_cNoGo;
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).tmod = 0;
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).pmod = struct('name', {}, 'param', {}, 'poly', {});
-         4. incorrect NoGo trials
+        % 4. incorrect NoGo trials
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).name = 'iNoGo';
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).onset = onset_iNoGo;
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).cond(2).duration = dur_iNoGo;
