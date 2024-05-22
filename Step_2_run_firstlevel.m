@@ -6,7 +6,7 @@ fmriprep_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/d
 bidsinput_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input';
 model_dir = '/oak/stanford/groups/leanew1/SHARED_DATASETS/private/BITS/data/bids-input/bids-input/';
 
-mask = ['BrainMask_05_91x109x91.img'];
+mask = ['/oak/stanford/groups/leanew1/BITS/BrainMask_05_91x109x91.img'];
 
 subject_all = {'BITS045'};
 
