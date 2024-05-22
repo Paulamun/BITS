@@ -71,3 +71,4 @@ if ~exist(fullfile(spmdir, 'con_0003.nii'), 'file')
     spm_jobman('interactive',matlabbatch);
     spm_jobman('run',matlabbatch);
 end
+end
