@@ -9,6 +9,7 @@ if ~exist(fullfile(spmdir, 'con_0003.nii'), 'file')
     matlabbatch{1}.spm.stats.fmri_spec.timing.RT = TR;
     matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t = nsclices;
     matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t0 = floor(nsclices/2);
+    
     for run = 0
         sess = run + 1;
         % find fmri data
@@ -52,23 +53,29 @@ if ~exist(fullfile(spmdir, 'con_0003.nii'), 'file')
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).multi_reg = {fullfile(out_dir, ['covregressors_run-',num2str(run),'.txt'])};
         matlabbatch{1}.spm.stats.fmri_spec.sess(sess).hpf = 128;
     end
+    
+    
     matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
     matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
     matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
     matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
     matlabbatch{1}.spm.stats.fmri_spec.mask = {mask};
     matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
+    
+    
     %% estimate model
     matlabbatch{2}.spm.stats.fmri_est.spmmat = {fullfile(spmdir, 'SPM.mat')};
     matlabbatch{2}.spm.stats.fmri_est.write_residuals = 0;
     matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
+    
     %% contrast
     matlabbatch{3}.spm.stats.con.spmmat = {fullfile(spmdir, 'SPM.mat')};
     matlabbatch{3}.spm.stats.con.consess{1}.tcon.name = 'iNoGovscNoGo';
     matlabbatch{3}.spm.stats.con.consess{1}.tcon.convec = [0 0 -1 1];
     matlabbatch{3}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
     matlabbatch{3}.spm.stats.con.delete = 1;
+    
     spm_jobman('interactive',matlabbatch);
     spm_jobman('run',matlabbatch);
-end
+
 end
