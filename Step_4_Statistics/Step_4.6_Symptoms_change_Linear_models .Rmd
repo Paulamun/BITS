@@ -1,0 +1,384 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-06-28"
+---
+
+```{r cars}
+data = read.csv(file = '~/Desktop/BITS_Post_Harmonization_Data copy.csv')
+```
+
+```{r cars}
+library(nlme)
+fit_lme <- lme(ACC~ HD1 + FD + Age+ Female0_Male1+ PreBITS0_PostBITS1, random = ~ 1 | subject, data = data)
+str(data)
+summary(fit_lme)
+```
+
+
+```{r}
+data = read.csv(file = '/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Final2_BITS_Pre_Harmonize_Data_Incorrect_SIR.csv')
+data$SIR.Total[data$SIR.Total==9999]='NA'
+data$SIR.Total= as.numeric(data$SIR.Total)
+
+data$SIR..Acquire[data$SIR..Acquire==9999]='NA'
+data$SIR..Acquire= as.numeric(data$SIR..Acquire)
+
+data$SIR.Clutter[data$SIR.Clutter==9999]='NA'
+data$SIR.Clutter= as.numeric(data$SIR.Clutter)
+
+data$SIR.Discard[data$SIR.Discard==9999]='NA'
+data$SIR.Discard= as.numeric(data$SIR.Discard)
+
+data$CIRI.Evaluator[data$CIRI.Evaluator==9999]='NA'
+data$CIRI.Evaluator= as.numeric(data$CIRI.Evaluator)
+
+# extract timepoint 1
+data_tp1<-data[data$PreBITS0_PostBITS1==0,]
+data_tp1=data_tp1[1:79,]
+# extracting timepoint 2
+data_tp2<-data[data$PreBITS0_PostBITS1==1,]
+# remove NA rows
+data_tp2=data_tp2[1:9,]
+# merge data
+data_merged<-merge(data_tp1,data_tp2,by='subject')
+# calculate change in SIR total first
+data_merged$SIR_Total_change=data_merged$SIR.Total.y-data_merged$SIR.Total.x
+data_merged$SIR_Acquire_change=data_merged$SIR..Acquire.y-data_merged$SIR..Acquire.x
+data_merged$SIR_Discard_change=data_merged$SIR.Discard.y-data_merged$SIR.Discard.x
+data_merged$SIR_Clutter_change=data_merged$SIR.Clutter.y-data_merged$SIR.Clutter.x
+data_merged$CIRI_Evaluator_change=data_merged$CIRI.Evaluator.y-data_merged$CIRI.Evaluator.x
+
+# calculate change in brain region
+data_merged$Left_Insula_change=data_merged$Left_Insula.y-data_merged$Left_Insula.x
+data_merged$Right_Insula_change=data_merged$Right_Insula.y-data_merged$Right_Insula.x
+data_merged$ACC_change=data_merged$ACC.y-data_merged$ACC.x
+
+
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(aes(x=SIR_Total_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+model1<-lm(Left_Insula_change~SIR_Total_change,data=data_merged)
+summary(model1)
+
+model<-lm(SIR_Total_change~Left_Insula_change,data=data_merged)
+summary(model)
+cor.test(data_merged$SIR_Total_change,data_merged$Left_Insula_change)
+```
+
+```{r}
+library(ggplot2)
+
+#Correlation SI-R Total Change
+
+model1<-lm(SIR_Total_change~Left_Insula_change,data=data_merged)
+summary(model1)
+cor.test(data_merged$SIR_Total_change,data_merged$Left_Insula_change)
+
+ggplot(aes(x=SIR_Total_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Total_change, data_merged$Left_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+
+model2<-lm(SIR_Total_change~Right_Insula_change,data=data_merged)
+summary(model2)
+cor.test(data_merged$SIR_Total_change,data_merged$Right_Insula_change)
+
+ggplot(aes(x=SIR_Total_change,y=Right_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Total_change, data_merged$Right_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+model3<-lm(SIR_Total_change~ACC_change,data=data_merged)
+summary(model3)
+cor.test(data_merged$SIR_Total_change,data_merged$ACC_change)
+
+ggplot(aes(x=SIR_Total_change,y=ACC_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Total_change, data_merged$ACC_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+#Correlation SI-R Acquire
+model4 <- lm(SIR_Acquire_change~Left_Insula_change,data=data_merged)
+summary(model4)
+cor.test(data_merged$SIR_Acquire_change,data_merged$Left_Insula_change)
+
+ggplot(aes(x=SIR_Acquire_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Acquire_change, data_merged$Left_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+
+model5 <- lm(SIR_Acquire_change~Right_Insula_change,data=data_merged)
+summary(model5)
+cor.test(data_merged$SIR_Acquire_change,data_merged$Right_Insula_change)
+
+ggplot(aes(x=SIR_Acquire_change,y=Right_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Acquire_change, data_merged$Right_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+model6 <- lm(SIR_Acquire_change~ACC_change,data=data_merged)
+summary(model6)
+cor.test(data_merged$SIR_Acquire_change,data_merged$ACC_change)
+
+ggplot(aes(x=SIR_Acquire_change,y=ACC_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Acquire_change, data_merged$ACC_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+#Correlation SI-R Discard
+
+model7<-lm(SIR_Discard_change~Left_Insula_change,data=data_merged)
+summary(model7)
+cor.test(data_merged$SIR_Discard_change,data_merged$Left_Insula_change)
+
+ggplot(aes(x=SIR_Discard_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Discard_change, data_merged$Left_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+model8<-lm(SIR_Discard_change~Right_Insula_change,data=data_merged)
+summary(model8)
+cor.test(data_merged$SIR_Discard_change,data_merged$Right_Insula_change)
+
+ggplot(aes(x=SIR_Discard_change,y=Right_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Discard_change, data_merged$Right_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+model9<-lm(SIR_Discard_change~ACC_change,data=data_merged)
+summary(model9)
+cor.test(data_merged$SIR_Discard_change,data_merged$ACC_change)
+
+ggplot(aes(x=SIR_Discard_change,y=ACC_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Discard_change, data_merged$ACC_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+#Correlation SI-R Clutter
+model10<-lm(SIR_Clutter_change~Left_Insula_change,data=data_merged)
+summary(model10)
+cor.test(data_merged$SIR_Clutter_change,data_merged$Left_Insula_change)
+
+ggplot(aes(x=SIR_Clutter_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Clutter_change, data_merged$Left_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+
+
+model11<-lm(SIR_Clutter_change~Right_Insula_change,data=data_merged)
+summary(model11)
+cor.test(data_merged$SIR_Clutter_change,data_merged$Right_Insula_change)
+
+ggplot(aes(x=SIR_Clutter_change,y=Right_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Clutter_change, data_merged$Right_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+
+
+model12<-lm(SIR_Clutter_change~ACC_change,data=data_merged)
+summary(model12)
+cor.test(data_merged$SIR_Clutter_change,data_merged$ACC_change)
+
+ggplot(aes(x=SIR_Clutter_change,y=ACC_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$SIR_Clutter_change, data_merged$ACC_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+#Correlation CIRI Evaluator
+
+model13<-lm(CIRI_Evaluator_change~Left_Insula_change,data=data_merged)
+summary(model13)
+cor.test(data_merged$CIRI_Evaluator_change,data_merged$Left_Insula_change)
+
+ggplot(aes(x=CIRI_Evaluator_change,y=Left_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$CIRI_Evaluator_change, data_merged$Left_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+model14<-lm(CIRI_Evaluator_change~Right_Insula_change,data=data_merged)
+summary(model14)
+cor.test(data_merged$CIRI_Evaluator_change,data_merged$Right_Insula_change)
+
+ggplot(aes(x=CIRI_Evaluator_change,y=Right_Insula_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$CIRI_Evaluator_change, data_merged$Right_Insula_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+model15<-lm(CIRI_Evaluator_change~ACC_change,data=data_merged)
+summary(model15)
+cor.test(data_merged$CIRI_Evaluator_change,data_merged$ACC_change)
+
+ggplot(aes(x=CIRI_Evaluator_change,y=ACC_change),data=data_merged)+geom_point(size=3)+geom_smooth(method='lm')+theme_minimal(base_size=24)
+
+cor_test_result <- cor.test(data_merged$CIRI_Evaluator_change, data_merged$ACC_change)
+# Extract the correlation coefficient (r)
+r <- cor_test_result$estimate
+# Calculate the effect size (r^2)
+r_squared <- r^2
+# Print r and r^2
+print(r)          # Correlation coefficient
+print(r_squared)  # Effect size as r^2
+
+
+
+# Assuming the models are named as model1, model2, ..., model15
+# Create a list of model names
+model_names <- paste0("model", 1:15)
+
+# Initialize an empty list to store the summary information
+model_summaries <- list()
+
+# Loop through each model, extract the summary, and store in the list
+for (i in 1:15) {
+  # Access the model by name using get()
+  model <- get(model_names[i])
+  
+  # Extract the summary
+  model_summary <- summary(model)
+  
+  # Extract coefficients (estimate, std. error, t value, p value)
+  coef_summary <- as.data.frame(model_summary$coefficients)
+  
+  # Add row names (which represent the coefficient names) as a new column
+  coef_summary$Coefficient <- rownames(coef_summary)
+  
+  # Add model name to the data frame
+  coef_summary$Model <- model_names[i]
+  
+  # Reorder columns to make it more readable
+  coef_summary <- coef_summary[, c("Model", "Coefficient", "Estimate", "Std. Error", "t value", "Pr(>|t|)")]
+  
+  # Append to the list of model summaries
+  model_summaries[[i]] <- coef_summary
+}
+
+# Combine all summaries into one data frame
+combined_summaries <- do.call(rbind, model_summaries)
+
+# Save the combined summaries to a CSV file
+write.csv(combined_summaries, "combined_model_summaries.csv", row.names = FALSE)
+
+
+
+
+
+
+
+
+
+```
