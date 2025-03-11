@@ -1,0 +1,111 @@
+---
+title: "Harmonization"
+output: html_document
+date: "2024-06-21"
+---
+```{r}
+library(devtools)
+library(neuroCombat)
+```
+
+```{r}
+Bits_data= read.csv("/Users/paulamun/Desktop/GoNoGo_Committee_meeting/BITS_Pre_Harmonize_Data_Incorrect_SIR_RemoveHC_Other_Study.csv")
+
+```
+
+```{r}
+
+Right Insula
+
+#Harmonization
+Bits_data$Site<-as.factor(Bits_data$Site)
+Bits_data$subject<-as.factor(Bits_data$subject)
+str(Bits_data)
+
+Site <- Bits_data$Site
+#Include FD
+Bits_data.toharmonize <- Bits_data[,c("Right_Insula","FD")]
+#Include sex, age, medications
+mod <- model.matrix(~Bits_data$Female0_Male1+Bits_data$Age+Bits_data$HD1)
+dat <- t(Bits_data.toharmonize)
+Bits_data.combat <- neuroCombat(dat=dat,mod=mod,batch=Site,eb=FALSE)
+
+
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Bits_INCORRECT_Right_Insula.CSV")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.combat,
+     xlim = c(-16, 11),   # Set x-axis limits to the range
+     ylim = c(-16, 11),   # Set y-axis limits to the range
+     xlab = "Original Data", 
+     ylab = "Combat Data")
+_________________________________________________________________________________________________________
+Left Insula
+
+#Harmonization
+Bits_data$Site<-as.factor(Bits_data$Site)
+Bits_data$subject<-as.factor(Bits_data$subject)
+str(Bits_data)
+
+Site <- Bits_data$Site
+#Include FD
+Bits_data.toharmonize <- Bits_data[,c("Left_Insula","FD")]
+#Include sex, age, medications
+mod <- model.matrix(~Bits_data$Female0_Male1+Bits_data$Age+Bits_data$HD1)
+dat <- t(Bits_data.toharmonize)
+Bits_data.combat <- neuroCombat(dat=dat,mod=mod,batch=Site,eb=FALSE)
+
+
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Bits_INCORRECT_Left_Insula.CSV")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.combat,
+     xlim = c(-16, 11),   # Set x-axis limits to the range
+     ylim = c(-16, 11),   # Set y-axis limits to the range
+     xlab = "Original Data", 
+     ylab = "Combat Data")
+
+_________________________________________________________________________________________________________
+ACC
+
+#Harmonization
+Bits_data$Site<-as.factor(Bits_data$Site)
+Bits_data$subject<-as.factor(Bits_data$subject)
+str(Bits_data)
+
+Site <- Bits_data$Site
+#Include FD
+Bits_data.toharmonize <- Bits_data[,c("ACC","FD")]
+#Include sex, age, medications
+mod <- model.matrix(~Bits_data$Female0_Male1+Bits_data$Age+Bits_data$HD1)
+dat <- t(Bits_data.toharmonize)
+Bits_data.combat <- neuroCombat(dat=dat,mod=mod,batch=Site,eb=FALSE)
+
+
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Bits_INCORRECT_ACC.CSV")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.combat,
+     xlim = c(-16, 11),   # Set x-axis limits to the range
+     ylim = c(-16, 11),   # Set y-axis limits to the range
+     xlab = "Original Data", 
+     ylab = "Combat Data")
+```
+
+```{r}
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Bits_INCORRECT_Right_Insula.CSV")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.combat,
+     xlim = c(-16, 11),   # Set x-axis limits to the range
+     ylim = c(-16, 11),   # Set y-axis limits to the range
+     xlab = "Original Data", 
+     ylab = "Combat Data")
+
+
+```
+```{r}
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo  Committee meeting/Harmonized_withoutHC_OtherStudy/Bits_INCORRECT_ACC.csv")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.combat)
+
+
+```{r}
+write.csv(Bits_data.combat$dat.standardized,"/Users/paulamun/Desktop/GoNoGo  Committee meeting/Harmonized_withoutHC_OtherStudy/Bits_Harmonized_ACC_OtherStudy.csv")
+plot(Bits_data.combat$dat.original,Bits_data.combat$dat.standardized)
+```
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+

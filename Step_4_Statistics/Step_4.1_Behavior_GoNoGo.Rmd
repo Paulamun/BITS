@@ -1,0 +1,308 @@
+---
+title: "behavior GoNoGo task"
+output: html_document
+date: "2024-10-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(effsize)
+library(rcompanion)
+library(dplyr)
+
+# Load data
+data = read.csv(file = '/Users/paulamun/Desktop/GoNoGo_Committee_meeting/BITS_Pre_Harmonize_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+data = data[,-c(1,8,9,10,11,12)]
+
+# Subset data
+HC_data <- data[data$HD1 == 0, ]
+PreHD_data <- data[data$HD1 == 1 & data$PreBITS0_PostBITS1 == 0, ]
+PostHD_data <- data[data$HD1 == 1 & data$PreBITS0_PostBITS1 == 1, ]
+
+# Define columns to iterate over
+columns <- c("RT_Correct_Go", "RT_Incorrect_NoGo", "Task_Correct_Go", "Task_Incorrect_Go", "Task_Correct_NoGo", "Task_Incorrect_NoGo", "Ratio_cGo", "Ratio_iGo", "Ratio_cNoGo", "Ratio_iNoGo")
+# Define Errors of commision columns to iterate over
+columns_errors <- c("Task_Incorrect_Go", "Task_Incorrect_NoGo", "Ratio_iGo", "Ratio_iNoGo")
+# Define all the other columns to iterate over
+columns_others <- c("RT_Correct_Go", "RT_Incorrect_NoGo", "Task_Correct_Go", "Task_Correct_NoGo", "Ratio_cGo", "Ratio_cNoGo")
+
+# Define all comparisons
+comparisons <- list(
+  list(name = "HC_vs_PreHD", group1 = HC_data, group2 = PreHD_data),
+  list(name = "HC_vs_PostHD", group1 = HC_data, group2 = PostHD_data),
+  list(name = "PreHD vs PostHD", group1 = PreHD_data, group2 = PostHD_data)
+)
+
+# Define HC comparisons
+hc_comparisons <- list(
+  list(name = "HC_vs_PreHD", group1 = HC_data, group2 = PreHD_data),
+  list(name = "HC_vs_PostHD", group1 = HC_data, group2 = PostHD_data)
+)
+
+# Create an empty list to store all results
+all_results <- list()
+
+# Loop over each column and each HC comparison
+for (col in columns_errors) {
+  cat("\n### Analysis for column:", col, "###\n")
+  
+  for (comp in hc_comparisons) {
+    cat("\n--- Comparison:", comp$name, "---\n")
+    group1 <- comp$group1[[col]]
+    group2 <- comp$group2[[col]]
+    
+    # Remove NA values
+    group1 <- na.omit(group1)
+    group2 <- na.omit(group2)
+    
+    # Perform normality test
+    shapiro_group1 <- shapiro.test(group1)
+    shapiro_group2 <- shapiro.test(group2)
+    
+    # Calculate Cohen's d for unpaired comparison
+    effect_size <- cohen.d(group1, group2, paired = FALSE)
+    
+    # Perform Mann-Whitney U test
+    mann_whitney <- wilcox.test(group1, group2, alternative = "less", paired = FALSE)
+    U <- mann_whitney$statistic
+    
+    # Calculate Cliff's delta
+    cliff_delta <- cliff.delta(group1, group2)
+    
+    # Calculate sample sizes
+    n1 <- length(group1)
+    n2 <- length(group2)
+    
+    # Calculate rank-biserial correlation manually
+    rank_biserial_manual <- 1 - (2 * U) / (n1 * n2)
+    
+    # Calculate standard error of the U statistic
+    SE_U <- sqrt((n1 * n2 * (n1 + n2 + 1)) / 12)
+    
+    # Calculate standard error for each group
+    SE_group1 <- sd(group1) / sqrt(n1)
+    SE_group2 <- sd(group2) / sqrt(n2)
+    
+    # Calculate standard deviation for each group
+    SD_group1 <- sd(group1)
+    SD_group2 <- sd(group2)
+    
+    # Save results in a table
+    results <- data.frame(
+      Comparison = comp$name,
+      Column = col,
+      P_Value = mann_whitney$p.value,
+      SE_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SE_group1, NA),
+      SE_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SE_group2, NA),
+      SE_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SE_group2, NA),
+      SD_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SD_group1, NA),
+      SD_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SD_group2, NA),
+      SD_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SD_group2, NA),
+      W_Value = U,
+      Rank_Biserial_Correlation = rank_biserial_manual,
+      Shapiro_Group1_p_value = shapiro_group1$p.value,
+      Shapiro_Group2_p_value = shapiro_group2$p.value
+    )
+    print(results)
+    all_results <- append(all_results, list(results))
+  }
+}
+
+```
+
+
+```{r}
+# Loop over each column and each HC comparison
+for (col in columns_others) {
+  cat("\n### Analysis for column:", col, "###\n")
+  
+  for (comp in hc_comparisons) {
+    cat("\n--- Comparison:", comp$name, "---\n")
+    group1 <- comp$group1[[col]]
+    group2 <- comp$group2[[col]]
+    
+    # Remove NA values
+    group1 <- na.omit(group1)
+    group2 <- na.omit(group2)
+    
+    # Perform normality test
+    shapiro_group1 <- shapiro.test(group1)
+    shapiro_group2 <- shapiro.test(group2)
+    
+    # Calculate Cohen's d for unpaired comparison
+    effect_size <- cohen.d(group1, group2, paired = FALSE)
+    
+    # Perform Mann-Whitney U test
+    mann_whitney <- wilcox.test(group1, group2, paired = FALSE)
+    U <- mann_whitney$statistic
+    
+    # Calculate Cliff's delta
+    cliff_delta <- cliff.delta(group1, group2)
+    
+    # Calculate sample sizes
+    n1 <- length(group1)
+    n2 <- length(group2)
+    
+    # Calculate rank-biserial correlation manually
+    rank_biserial_manual <- 1 - (2 * U) / (n1 * n2)
+    
+    # Calculate standard error of the U statistic
+    SE_U <- sqrt((n1 * n2 * (n1 + n2 + 1)) / 12)
+    
+    # Calculate standard error for each group
+    SE_group1 <- sd(group1) / sqrt(n1)
+    SE_group2 <- sd(group2) / sqrt(n2)
+    
+    # Calculate standard deviation for each group
+    SD_group1 <- sd(group1)
+    SD_group2 <- sd(group2)
+    
+    # Save results in a table
+    results <- data.frame(
+      Comparison = comp$name,
+      Column = col,
+      P_Value = mann_whitney$p.value,
+      SE_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SE_group1, NA),
+      SE_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SE_group2, NA),
+      SE_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SE_group2, NA),
+      SD_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SD_group1, NA),
+      SD_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SD_group2, NA),
+      SD_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SD_group2, NA),
+      W_Value = U,
+      Rank_Biserial_Correlation = rank_biserial_manual,
+      Shapiro_Group1_p_value = shapiro_group1$p.value,
+      Shapiro_Group2_p_value = shapiro_group2$p.value
+    )
+    print(results)
+    all_results <- append(all_results, list(results))
+  }
+}
+```
+
+
+
+```{r}
+# Loop for PreHD vs PostHD comparison
+for (col in columns_errors) {
+  cat("\n### Analysis for column:", col, "###\n")
+  cat("\n--- Comparison: PreHD_vs_PostHD ---\n")
+  
+  # Remove subjects without observations at both timepoints
+  subjectsPost <- PostHD_data$subject
+  PreWithPost_HD_data <- PreHD_data[PreHD_data$subject %in% subjectsPost, ]
+  
+  group1 <- PreWithPost_HD_data[[col]]
+  group2 <- PostHD_data[[col]]
+  
+  # Remove NA values
+  group1 <- na.omit(group1)
+  group2 <- na.omit(group2)
+  
+  # Perform normality test
+  shapiro_group1 <- shapiro.test(group1)
+  shapiro_group2 <- shapiro.test(group2)
+  
+  # Perform a one-tailed Wilcoxon signed-rank test (alternative: after > before)
+  wilcox_paired_result <- wilcox.test(group1, group2, alternative = "greater", paired = TRUE)
+  
+  # Calculate sample sizes
+  n1 <- length(group1)
+  n2 <- length(group2)
+  
+  # Calculate standard error for each group
+  SE_group1 <- sd(group1) / sqrt(n1)
+  SE_group2 <- sd(group2) / sqrt(n2)
+  
+  # Calculate standard deviation for each group
+  SD_group1 <- sd(group1)
+  SD_group2 <- sd(group2)
+  
+  # Save results in a table
+  results <- data.frame(
+    Comparison = "PreHD_vs_PostHD",
+    Column = col,
+    P_Value = wilcox_paired_result$p.value,
+    SE_PreBIT = SE_group1,
+    SE_PostBIT = SE_group2,
+    SD_PreBIT = SD_group1,
+    SD_PostBIT = SD_group2,
+    Shapiro_Group1_p_value = shapiro_group1$p.value,
+    Shapiro_Group2_p_value = shapiro_group2$p.value
+  )
+  print(results)
+  all_results <- append(all_results, list(results))
+}
+
+```
+
+
+```{r}
+# Loop for PreHD vs PostHD comparison
+for (col in columns_others) {
+  cat("\n### Analysis for column:", col, "###\n")
+  cat("\n--- Comparison: PreHD_vs_PostHD ---\n")
+  
+  # Remove subjects without observations at both timepoints
+  subjectsPost <- PostHD_data$subject
+  PreWithPost_HD_data <- PreHD_data[PreHD_data$subject %in% subjectsPost, ]
+  
+  group1 <- PreWithPost_HD_data[[col]]
+  group2 <- PostHD_data[[col]]
+  
+  # Remove NA values
+  group1 <- na.omit(group1)
+  group2 <- na.omit(group2)
+  
+  # Perform normality test
+  shapiro_group1 <- shapiro.test(group1)
+  shapiro_group2 <- shapiro.test(group2)
+  
+  # Perform a one-tailed Wilcoxon signed-rank test (alternative: after > before)
+  wilcox_paired_result <- wilcox.test(group1, group2, paired = TRUE)
+  
+  # Calculate sample sizes
+  n1 <- length(group1)
+  n2 <- length(group2)
+  
+  # Calculate standard error for each group
+  SE_group1 <- sd(group1) / sqrt(n1)
+  SE_group2 <- sd(group2) / sqrt(n2)
+  
+  # Calculate standard deviation for each group
+  SD_group1 <- sd(group1)
+  SD_group2 <- sd(group2)
+  
+  # Save results in a table
+  results <- data.frame(
+    Comparison = "PreHD_vs_PostHD",
+    Column = col,
+    P_Value = wilcox_paired_result$p.value,
+    SE_PreBIT = SE_group1,
+    SE_PostBIT = SE_group2,
+    SD_PreBIT = SD_group1,
+    SD_PostBIT = SD_group2,
+    Shapiro_Group1_p_value = shapiro_group1$p.value,
+    Shapiro_Group2_p_value = shapiro_group2$p.value
+  )
+  print(results)
+  all_results <- append(all_results, list(results))
+}
+
+# Combine all results into one data frame and transpose
+final_results <- bind_rows(all_results) %>% t() %>% as.data.frame()
+
+# Save the transposed results to a CSV file
+write.csv(final_results, file = '/Users/paulamun/Desktop/GoNoGo_Committee_meeting/Analysis_Results.csv', row.names = TRUE)
+
+```
+
