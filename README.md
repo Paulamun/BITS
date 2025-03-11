@@ -1,10 +1,3 @@
-ml python/3.9
-=======
-# BITS
-Coding steps used in the analysis of the BIT+ study
-
-By Paula
-
-
-module load py-numpy/1.26.3_py312
-module load py-pandas/2.2.1_py312
+# Neurocognitive effects of BIT+ in HD: Neuroimaging and Statistical Analysis
+Coding steps used in the analysis of the following study:
+"Muñoz Rodríguez P.A., Pines A., Zing X., Williams L.N., Rodriguez C. Exploring the Effects of Cognitive Behavioral Therapy on Cognitive Control Circuit and Behavioral Task Performance in Hoarding Disorder. Journal of Psychiatric Research (2025)"
