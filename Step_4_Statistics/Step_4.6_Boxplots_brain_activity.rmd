@@ -1,0 +1,730 @@
+---
+title: "Boxplots_Beta_Non_Winsorized"
+output: html_document
+date: "2025-02-21"
+---
+
+```{r}
+# read in data
+HCHarmonize=read.csv('/Users/paulamun/Desktop/GoNoGo_Committee_meeting/To_winsorize/BITS_HC_Harmonized_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+#Remove extra rows
+HCHarmonize=HCHarmonize[-c(50,51,52,53,54,55),]
+
+PostHDHarmonize=read.csv('/Users/paulamun/Desktop/GoNoGo_Committee_meeting/To_winsorize/BITS_HD_PostBITS_Harmonized_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+#Remove extra rows
+PostHDHarmonize=PostHDHarmonize[-c(10,11,12,13,14,15),]
+
+ 
+PreHDHarmonize=read.csv('/Users/paulamun/Desktop/GoNoGo_Committee_meeting/To_winsorize/BITS_HD_PreBITS_Harmonized_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+#Remove extra rows
+PreHDHarmonize=PreHDHarmonize[-c(20,21,22,23,24,25),]
+ 
+ 
+HCPreHarmonize=read.csv('/Users/paulamun/Desktop/GoNoGo_Committee_meeting/To_winsorize/Pre_Harmonized/BITS_HC_Pre_Harmonize_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+#Remove extra rows
+
+HDPreHarmonize=read.csv('/Users/paulamun/Desktop/GoNoGo_Committee_meeting/To_winsorize/Pre_Harmonized/BITS_HD_Pre_Harmonize_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+PreHDPreHarmonize=HDPreHarmonize[HDPreHarmonize$HD1 == 1 & HDPreHarmonize$PreBITS0_PostBITS1 == 0, ]
+
+PostHDPreHarmonize=HDPreHarmonize[HDPreHarmonize$HD1 == 1 & HDPreHarmonize$PreBITS0_PostBITS1 == 1, ]
+
+```
+
+Non-Winsorized: HC vs Pre-BIT+
+```{r}
+
+################## RIGTH INSULA
+
+#Merge dataframes
+HC_PreHD_PostHarmonize=data.frame(rbind(PreHDHarmonize,HCHarmonize))
+
+HC_PreHD_PostHarmonize$HD1<-as.factor(HC_PreHD_PostHarmonize$HD1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PreHD_PostHarmonize, aes(x = HD1, y = Right_Insula, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Pre-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#dfe5f4")) +  # Set specific colors for 'HC' and 'Pre-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Right Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+   # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+################## LEFT INSULA
+
+#Merge dataframes
+HC_PreHD_PostHarmonize=data.frame(rbind(PreHDHarmonize,HCHarmonize))
+
+HC_PreHD_PostHarmonize$HD1<-as.factor(HC_PreHD_PostHarmonize$HD1)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PreHD_PostHarmonize, aes(x = HD1, y = Left_Insula, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+  geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Pre-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#dfe5f4")) +  # Set specific colors for 'HC' and 'Pre-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Left Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+   # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+################## ACC
+
+#Merge dataframes
+HC_PreHD_PostHarmonize=data.frame(rbind(PreHDHarmonize,HCHarmonize))
+
+HC_PreHD_PostHarmonize$HD1<-as.factor(HC_PreHD_PostHarmonize$HD1)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PreHD_PostHarmonize, aes(x = HD1, y = ACC, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+  geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Pre-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#dfe5f4")) +  # Set specific colors for 'HC' and 'Pre-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "ACC",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+   # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+Non-Winsorized HC VS Post-HD
+```{r}
+
+################## RIGTH INSULA
+
+#Merge dataframes
+HC_PostHD_PostHarmonize=data.frame(rbind(PostHDHarmonize,HCHarmonize))
+
+HC_PostHD_PostHarmonize$HD1<-as.factor(HC_PostHD_PostHarmonize$HD1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PostHD_PostHarmonize, aes(x = HD1, y = Right_Insula, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Post-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#4c628e")) +  # Set specific colors for 'HC' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Right Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+     # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+##################LEFT INSULA
+
+#Merge dataframes
+HC_PostHD_PostHarmonize=data.frame(rbind(PostHDHarmonize,HCHarmonize))
+
+HC_PostHD_PostHarmonize$HD1<-as.factor(HC_PostHD_PostHarmonize$HD1)
+
+#Graph
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PostHD_PostHarmonize, aes(x = HD1, y = Left_Insula, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Post-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#4c628e")) +  # Set specific colors for 'HC' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Left Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+     # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+################## ACC
+
+#Merge dataframes
+HC_PostHD_PostHarmonize=data.frame(rbind(PostHDHarmonize,HCHarmonize))
+
+HC_PostHD_PostHarmonize$HD1<-as.factor(HC_PostHD_PostHarmonize$HD1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(HC_PostHD_PostHarmonize, aes(x = HD1, y = ACC, fill = HD1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = HD1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'HD1' categories
+  scale_x_discrete(labels = c('HC', 'Post-BIT+')) +
+  
+  # Specify custom fill colors for the boxplots based on 'HD1' categories
+  scale_fill_manual(values = c("#f1e1b6", "#4c628e")) +  # Set specific colors for 'HC' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "ACC",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+   # Setting y-axis limits to range from -2 to 2
+  ylim(-4, 4) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(20,120,20,120),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+Non-Winsorized Pre-HD VS Post-HD (19 vs 9)
+```{r}
+
+################## RIGTH INSULA
+#Merge dataframes
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = Right_Insula, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the PreBITS0_PostBITS1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+    # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Right Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+ 
+        # Setting y-axis limits to range from -2 to 2
+  ylim(-14, 14) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+################## LEFT INSULA
+
+#Merge dataframes
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = Left_Insula, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+  geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the PreBITS0_PostBITS1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+  # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Left Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+      # Setting y-axis limits to range from -2 to 2
+  ylim(-14, 14) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+
+
+```
+
+```{r}
+################## ACC
+
+#Merge dataframes
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = ACC, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+  geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+    # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "ACC",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+      # Setting y-axis limits to range from -2 to 2
+  ylim(-14, 14) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+Non-Winsorized: Pre-BIT+ vs Post-BIT+ n=9
+```{r}
+
+################## RIGTH INSULA
+
+#Merge dataframes
+PreHDPreHarmonize_subset=subset(PreHDPreHarmonize, subject %in% PostHDPreHarmonize$subject)
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize_subset,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = Right_Insula, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the PreBITS0_PostBITS1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+    # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Right Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+ 
+       # Setting y-axis limits to range from -8 to 8
+  ylim(-14, 14) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
+
+```{r}
+################## LEFT INSULA
+
+#Merge dataframes
+PreHDPreHarmonize_subset=subset(PreHDPreHarmonize, subject %in% PostHDPreHarmonize$subject)
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize_subset,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+#Graph
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = Left_Insula, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+ geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the PreBITS0_PostBITS1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+    # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "Left Insula",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+
+        # Setting y-axis limits to range from -8 to 8
+  ylim(-14, 14) + 
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+
+
+```
+
+```{r}
+################## ACC
+
+PreHDPreHarmonize_subset=subset(PreHDPreHarmonize, subject %in% PostHDPreHarmonize$subject)
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize_subset,PostHDPreHarmonize))
+
+#Merge dataframes
+PreHD_PostHD_PreHarmonize=data.frame(rbind(PreHDPreHarmonize,PostHDPreHarmonize))
+
+PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1<-as.factor(PreHD_PostHD_PreHarmonize$PreBITS0_PostBITS1)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+
+# Plotting data with boxplot and jitter points
+ggplot(PreHD_PostHD_PreHarmonize, aes(x = PreBITS0_PostBITS1, y = ACC, fill = PreBITS0_PostBITS1)) +
+  
+  # Adding a boxplot for both groups with slight transparency
+  geom_boxplot(outlier.shape = NA, width=0.5) +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+# Adding jitter points for both groups without subsetting and differentiating by shape
+  geom_jitter(
+    aes(shape = PreBITS0_PostBITS1),  # Map shape to the HD1 variable to differentiate the groups
+    width = 0.1,  # Spread the points horizontally to avoid overlap
+    height = 0.05,  # Add slight vertical spread for better visibility
+    alpha = 0.8,  # Set transparency to 80%
+    size = 1  # Set the size of the points for better visibility
+  ) +
+  scale_shape_manual(values = c(16, 1)) +  # Shape 16 for filled dots and shape 1 for empty circles
+  
+    # Modify x-axis labels to display custom names for 'PreBITS0_PostBITS1' categories
+  scale_x_discrete(labels = c('Pre-BIT+','Post-BIT+' )) +
+  
+  # Specify custom fill colors for the boxplots based on 'PreBITS0_PostBITS1' categories
+  scale_fill_manual(values = c("#dfe5f4", "#4c628e")) +  # Set specific colors for 'Pre-BIT' and 'Post-BIT+' groups
+    
+  # Adding labels for the title and axes
+   labs(
+    title = "ACC",  # Set the plot title
+    x = "",  # Leave x-axis without a label
+    y = "Beta Estimate"  # Set a custom y-axis label
+  ) +
+  
+      # Setting y-axis limits to range from -8 to 8
+  ylim(-14, 14) +
+  
+  # Apply a minimal theme to make the plot look clean
+  theme_minimal(base_size = 18)  +# Set a larger base font size to ensure text is readable
+   theme(
+    plot.margin = margin(10,70,10,70),
+    panel.grid.major = element_blank(),  # Remove major grid lines (both horizontal and vertical)
+    panel.grid.minor = element_blank(),   # Remove minor grid lines (both horizontal and vertical)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add line along x-axis
+    axis.line.y = element_line(color = "black", size = 0.5),  # Add line along y-axis
+    panel.border = element_blank()  # Remove the border completely for an L-shape
+  )
+```
