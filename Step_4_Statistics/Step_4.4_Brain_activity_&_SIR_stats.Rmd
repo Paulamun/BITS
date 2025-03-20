@@ -1,0 +1,396 @@
+---
+title: "Statistics Brain activity per region and SIR"
+output: html_document
+date: "2025-02-20"
+---
+```{r}
+# Load necessary libraries
+library(effsize)  # For Cohen's d and Cliff's delta
+library(rcompanion)
+library(dplyr)
+
+# Read data
+data <- read.csv(file = '~/Desktop/GoNoGo_Committee_meeting/BITS_Harmonized_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+# Remove unnecessary columns
+data <- data[,-c(1,8,9,10)]
+
+# Split data into groups
+HC_data <- data[data$HD1 == 0, ]
+PreHD_data <- data[data$HD1 == 1 & data$PreBITS0_PostBITS1 == 0, ]
+PostHD_data <- data[data$HD1 == 1 & data$PreBITS0_PostBITS1 == 1, ]
+
+# Define all comparisons
+comparisons <- list(
+  list(name = "HC_vs_PreHD", group1 = HC_data, group2 = PreHD_data),
+  list(name = "HC_vs_PostHD", group1 = HC_data, group2 = PostHD_data)
+)
+
+# Define brain regions
+regions <- c("Right_Insula", "Left_Insula", "ACC")
+
+# Initialize a list to store results
+all_results <- list()
+
+# Loop through each comparison
+for (comp in comparisons) {
+  cat("\n--- Harmonized Data Comparison:", comp$name, "---\n")
+  # Loop through each region
+  for (region in regions) {
+    cat("\n### Analysis for", region, "###\n")
+    
+    # Extract groups dynamically based on the comparison
+    group1 <- comp$group1[[region]]
+    group2 <- comp$group2[[region]]
+    
+    # Remove NA values
+    group1 <- na.omit(group1)
+    group2 <- na.omit(group2)
+
+    # Perform normality test
+    shapiro_group1 <- shapiro.test(group1)
+    shapiro_group2 <- shapiro.test(group2)
+    
+    # Calculate Cohen's d for unpaired comparison
+    effect_size <- cohen.d(group1, group2, paired = FALSE)
+    
+    # Perform Mann-Whitney U test
+    mann_whitney <- wilcox.test(group2, group1, alternative = "greater", paired = FALSE)
+    U <- mann_whitney$statistic
+    
+    # Calculate Cliff's delta
+    cliff_delta <- cliff.delta(group1, group2)
+
+    # Calculate sample sizes
+    n1 <- length(group1)
+    n2 <- length(group2)
+    
+    # Calculate rank-biserial correlation manually
+    rank_biserial_manual <- 1 - (2 * U) / (n1 * n2)
+    
+    # Calculate standard error of the U statistic
+    SE_U <- sqrt((n1 * n2 * (n1 + n2 + 1)) / 12)
+    
+    # Calculate standard error for each group
+    SE_group1 <- sd(group1) / sqrt(n1)
+    SE_group2 <- sd(group2) / sqrt(n2)
+    
+    # Calculate standard deviation for each group
+    SD_group1 <- sd(group1)
+    SD_group2 <- sd(group2)
+    
+    # Calculate Interquartile Range (IQR) for each group
+    IQR_group1 <- IQR(group1)
+    IQR_group2 <- IQR(group2)
+    
+    # Perform F-test for variance comparison
+    f_test <- var.test(group1, group2)
+    
+    # Save results in a table
+    results <- data.frame(
+      Region = region,
+      Comparison = comp$name,
+      p_Value_mann_whitney = mann_whitney$p.value,
+      Cohen_d = effect_size$estimate,
+      SE_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SE_group1, NA),
+      SE_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SE_group2,
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SE_group1, NA)),
+      SE_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SE_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SE_group2,NA)),
+      SD_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SD_group1, NA),
+      SD_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SD_group2, 
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SD_group1,NA)),
+      SD_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SD_group2,
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SD_group2,NA)),
+      IQR_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", IQR_group1, NA),
+      IQR_PreBIT = ifelse(comp$name == "HC_vs_PreHD", IQR_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group1, NA)),
+      IQR_PostBIT = ifelse(comp$name == "HC_vs_PostHD", IQR_group2, 
+                    ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group2, NA)),
+      U_Value = U,
+      Rank_Biserial_Correlation = rank_biserial_manual,
+      Cliff_Delta = cliff_delta$estimate,
+      F_Test_P_Value = f_test$p.value,  # P-value from F-test
+      F_Statistic = f_test$statistic,   # F-statistic
+      Shapiro_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", shapiro_group1$p.value, NA),
+      Shapiro_PreBIT = ifelse(comp$name == "HC_vs_PreHD", shapiro_group2$p.value,
+                       ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group1$p.value, NA)),
+      Shapiro_PostBIT = ifelse(comp$name == "HC_vs_PostHD", shapiro_group2$p.value,
+                        ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group2$p.value, NA))
+    )
+    
+    print(results)
+    all_results <- append(all_results, list(results))
+  }
+}
+
+
+
+
+```
+
+```{r}
+# Read data
+data_preHarmonization <- read.csv(file = '~/Desktop/GoNoGo_Committee_meeting/BITS_Pre_Harmonize_Data_Incorrect_SIR_RemoveHC_Other_Study.csv')
+
+# Remove unnecessary columns
+data_preHarmonization <- data_preHarmonization[,-c(1,8,9,10)]
+
+# Split data into groups
+HC_data <- data_preHarmonization[data_preHarmonization$HD1 == 0, ]
+PreHD_data <- data_preHarmonization[data_preHarmonization$HD1 == 1 & data_preHarmonization$PreBITS0_PostBITS1 == 0, ]
+PostHD_data <- data_preHarmonization[data_preHarmonization$HD1 == 1 & data_preHarmonization$PreBITS0_PostBITS1 == 1, ]
+# remove subjects without observations at both timepoints
+subjectsPost=PostHD_data$subject
+PreWithPost_HD_data = PreHD_data[PreHD_data$subject %in% subjectsPost, ]
+
+# Define all comparisons
+comparisons <- list(
+  list(name = "PreHD_vs_PostHD(19vs9)", group1 = PreHD_data, group2 = PostHD_data),
+  list(name = "PreHD_vs_PostHD(n=9)", group1 = PreWithPost_HD_data, group2 = PostHD_data)
+)
+
+# Define brain regions
+regions <- c("Right_Insula", "Left_Insula", "ACC")
+    
+# Loop through each comparison
+for (comp in comparisons) {
+ cat("\n---Pre-Harmonization Data Comparison:", comp$name, "---\n")
+  # Loop through each region
+  for (region in regions) {
+    cat("\n### Analysis for", region, "###\n")    
+    # Extract groups dynamically based on the comparison
+    group1 <- comp$group1[[region]]
+    group2 <- comp$group2[[region]]
+    
+    # Remove NA values
+    group1 <- na.omit(group1)
+    group2 <- na.omit(group2)
+    
+    # Perform normality test
+    shapiro_group1 <- shapiro.test(group1)
+    shapiro_group2 <- shapiro.test(group2)
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Calculate Cohen's d for unpaired comparison
+      effect_size <- cohen.d(group1, group2, paired = TRUE)
+    }
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Perform Mann-Whitney U test
+      mann_whitney <- wilcox.test(group1, group2, alternative = "greater", paired = TRUE)
+    }
+
+    if (comp$name == "PreHD_vs_PostHD(19vs9)") {
+      # Perform Mann-Whitney U test
+      mann_whitney <- wilcox.test(group1, group2, alternative = "greater", paired = FALSE)
+    }    
+    
+    U <- mann_whitney$statistic
+    
+    # Calculate Cliff's delta
+    cliff_delta <- cliff.delta(group1, group2)
+    
+    # Calculate sample sizes
+    n1 <- length(group1)
+    n2 <- length(group2)
+    
+    # Calculate rank-biserial correlation manually
+    rank_biserial_manual <- 1 - (2 * U) / (n1 * n2)
+    
+    # Calculate standard error of the U statistic
+    SE_U <- sqrt((n1 * n2 * (n1 + n2 + 1)) / 12)
+    
+    # Calculate standard error for each group
+    SE_group1 <- sd(group1) / sqrt(n1)
+    SE_group2 <- sd(group2) / sqrt(n2)
+    
+    # Calculate standard deviation for each group
+    SD_group1 <- sd(group1)
+    SD_group2 <- sd(group2)
+    
+    # Calculate Interquartile Range (IQR) for each group
+    IQR_group1 <- IQR(group1)
+    IQR_group2 <- IQR(group2)
+    
+    # Perform F-test for variance comparison
+    f_test <- var.test(group1, group2)
+    
+    # Save results in a table
+    results <- data.frame(
+      Region = region,
+      Comparison = paste("Pre_Harmonization_", comp$name),
+      p_Value_mann_whitney = mann_whitney$p.value,
+      Cohen_d = effect_size$estimate,
+      SE_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SE_group1, NA),
+      SE_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SE_group2,
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SE_group1, NA)),
+      SE_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SE_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SE_group2,NA)),
+      SD_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SD_group1, NA),
+      SD_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SD_group2, 
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SD_group1,NA)),
+      SD_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SD_group2,
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SD_group2,NA)),
+      IQR_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", IQR_group1, NA),
+      IQR_PreBIT = ifelse(comp$name == "HC_vs_PreHD", IQR_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group1, NA)),
+      IQR_PostBIT = ifelse(comp$name == "HC_vs_PostHD", IQR_group2, 
+                    ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group2, NA)),
+      U_Value = U,
+      Rank_Biserial_Correlation = rank_biserial_manual,
+      Cliff_Delta = cliff_delta$estimate,
+      F_Test_P_Value = f_test$p.value,  # P-value from F-test
+      F_Statistic = f_test$statistic,   # F-statistic
+      Shapiro_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", shapiro_group1$p.value, NA),
+      Shapiro_PreBIT = ifelse(comp$name == "HC_vs_PreHD", shapiro_group2$p.value,
+                       ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group1$p.value, NA)),
+      Shapiro_PostBIT = ifelse(comp$name == "HC_vs_PostHD", shapiro_group2$p.value,
+                        ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group2$p.value, NA))
+    )
+    
+    print(results)
+    all_results <- append(all_results, list(results))
+  }
+}
+
+
+```
+
+```{r}
+
+# Define brain regions
+SIR_changes <- c("SIR.Total", "SIR..AC")
+
+# Loop through each comparison
+for (comp in comparisons) {
+  cat("\n---Pre-Harmonization Data Comparison:", comp$name, "---\n")
+  # Loop through each SIR change
+  for (change in SIR_changes) {
+    cat("\n### Analysis for", change, "###\n") 
+    
+    if (comp$name == "PreHD_vs_PostHD(19vs9)") {
+      # Remove subject BITS024 that has not completed the tests
+      filtered_group1 <- comp$group1
+      filtered_group2 <- comp$group2[comp$group2$subject != "BITS024", ] 
+    }
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Remove subject BITS024 that has not completed the tests
+      filtered_group1 <- comp$group1[comp$group1$subject != "BITS024", ]
+      filtered_group2 <- comp$group2[comp$group2$subject != "BITS024", ] 
+    }
+    
+    # Extract groups dynamically based on the comparison
+    group1 <- filtered_group1[[change]]
+    group2 <- filtered_group2[[change]]
+    
+    # Remove NA values
+    group1 <- na.omit(group1)
+    group2 <- na.omit(group2)
+    
+    # Perform normality test
+    shapiro_group1 <- shapiro.test(group1)
+    shapiro_group2 <- shapiro.test(group2)
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Calculate Cohen's d for unpaired comparison
+      effect_size <- cohen.d(group1, group2, paired = TRUE)
+    }
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Perform Mann-Whitney U test
+      mann_whitney <- wilcox.test(group1, group2, alternative = "greater", paired = TRUE)
+    }
+
+    if (comp$name == "PreHD_vs_PostHD(19vs9)") {
+      # Perform Mann-Whitney U test
+      mann_whitney <- wilcox.test(group1, group2, alternative = "greater", paired = FALSE)
+    }  
+    
+    U <- mann_whitney$statistic
+    
+    # Calculate Cliff's delta
+    cliff_delta <- cliff.delta(group1, group2)
+    
+    # Calculate sample sizes
+    n1 <- length(group1)
+    n2 <- length(group2)
+    
+    # Calculate rank-biserial correlation manually
+    rank_biserial_manual <- 1 - (2 * U) / (n1 * n2)
+    
+    # Calculate standard error of the U statistic
+    SE_U <- sqrt((n1 * n2 * (n1 + n2 + 1)) / 12)
+    
+    # Calculate standard error for each group
+    SE_group1 <- sd(group1) / sqrt(n1)
+    SE_group2 <- sd(group2) / sqrt(n2)
+    
+    # Calculate standard deviation for each group
+    SD_group1 <- sd(group1)
+    SD_group2 <- sd(group2)
+    
+    # Calculate Interquartile Range (IQR) for each group
+    IQR_group1 <- IQR(group1)
+    IQR_group2 <- IQR(group2)
+    
+    # Perform F-test for variance comparison
+    f_test <- var.test(group1, group2)
+    
+    if (comp$name == "PreHD_vs_PostHD(19vs9)") {
+      # Perform t-test paired since the data are normally distributed and the variance are similar
+      t_test <- t.test(group1, group2, paired = FALSE, var.equal = TRUE)
+    }
+    
+    if (comp$name == "PreHD_vs_PostHD(n=9)") {
+      # Perform t-test paired since the data are normally distributed and the variance are similar
+      t_test <- t.test(group1, group2, paired = TRUE, var.equal = TRUE)
+    }
+    
+    # Save results in a table
+    results <- data.frame(
+      Region = change,
+      Comparison = paste("Pre_Harmonization_", comp$name, "-BITS024"),
+      p_Value_mann_whitney = mann_whitney$p.value,
+      Cohen_d = effect_size$estimate,
+      SE_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SE_group1, NA),
+      SE_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SE_group2,
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SE_group1, NA)),
+      SE_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SE_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SE_group2,NA)),
+      SD_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", SD_group1, NA),
+      SD_PreBIT = ifelse(comp$name == "HC_vs_PreHD", SD_group2, 
+                  ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),SD_group1,NA)),
+      SD_PostBIT = ifelse(comp$name == "HC_vs_PostHD", SD_group2,
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), SD_group2,NA)),
+      IQR_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", IQR_group1, NA),
+      IQR_PreBIT = ifelse(comp$name == "HC_vs_PreHD", IQR_group2, 
+                   ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group1, NA)),
+      IQR_PostBIT = ifelse(comp$name == "HC_vs_PostHD", IQR_group2, 
+                    ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"),IQR_group2, NA)),
+      U_Value = U,
+      Rank_Biserial_Correlation = rank_biserial_manual,
+      Cliff_Delta = cliff_delta$estimate,
+      F_Test_P_Value = f_test$p.value,  # P-value from F-test
+      F_Statistic = f_test$statistic,   # F-statistic
+      Shapiro_HC = ifelse(comp$name == "HC_vs_PreHD" | comp$name == "HC_vs_PostHD", shapiro_group1$p.value, NA),
+      Shapiro_PreBIT = ifelse(comp$name == "HC_vs_PreHD", shapiro_group2$p.value,
+                       ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group1$p.value, NA)),
+      Shapiro_PostBIT = ifelse(comp$name == "HC_vs_PostHD", shapiro_group2$p.value,
+                        ifelse(comp$name %in% c("PreHD_vs_PostHD(19vs9)", "PreHD_vs_PostHD(n=9)"), shapiro_group2$p.value, NA)),
+      p_value_t_test = t_test$p.value,
+      t_value_t_test = t_test$statistic
+    )
+    
+    print(results)
+    all_results <- append(all_results, list(results))
+  }
+}
+
+# Combine all results into one data frame and transpose
+final_results <- bind_rows(all_results) %>% t() %>% as.data.frame()
+
+# Save the transposed results to a CSV file
+write.csv(final_results, file = '~/Desktop/GoNoGo_Committee_meeting/Analysis_Regions_SIR_ResultsFinal_3.csv', row.names = TRUE)
+```
