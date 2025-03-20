@@ -75,14 +75,15 @@ print(SD)
 # Calculate the standard deviation
 SD <- sd(PreHD_data$Right_Insula)
 print(SD)
-____________________________________________________________________________________________________________________
+```
+
+```{r}
 #Left Insula
 
 # Calculate Cohen's d for unpaired comparison
 effect_size <- cohen.d(HC_data$Left_Insula, PreHD_data$Left_Insula, paired = FALSE)
 print(effect_size)
 
-)
 # Remove rows with NA values in the combined dataset
 Left_Insula_combined <- Left_Insula_combined[!is.na(Left_Insula_combined$value), ]
 
@@ -141,8 +142,9 @@ SD <- sd(data)
 n <- length(data)
 SE <- SD / sqrt(n)
 print(SE)
+```
 
-____________________________________________________________________________________________________________________
+```{r}
 #ACC
 
 # Calculate Cohen's d for unpaired comparison
@@ -197,7 +199,6 @@ print(SD)
 # Calculate the standard deviation
 SD <- sd(PreHD_data$ACC)
 print(SD)
-
 
 ```
 
@@ -266,14 +267,16 @@ print(SD)
 # Calculate the standard deviation
 SD <- sd(PostHD_data$Right_Insula)
 print(SD)
-____________________________________________________________________________________________________________________
+
+```
+
+```{r}
 #Left Insula
 
 # Calculate Cohen's d for unpaired comparison
 effect_size <- cohen.d(HC_data$Left_Insula, PostHD_data$Left_Insula, paired = FALSE)
 print(effect_size)
 
-)
 # Remove rows with NA values in the combined dataset
 Left_Insula_combined <- Left_Insula_combined[!is.na(Left_Insula_combined$value), ]
 
@@ -332,8 +335,9 @@ SD <- sd(data)
 n <- length(data)
 SE <- SD / sqrt(n)
 print(SE)
+
 ```
-____________________________________________________________________________________________________________________
+
 ```{r}
 #ACC
 
@@ -471,7 +475,9 @@ print(SD)
 # Calculate the standard deviation
 SD <- sd(PostHD_data$Right_Insula)
 print(SD)
-____________________________________________________________________________________________________________________
+```
+
+```{r}
 #Left Insula
 
 # Calculate Cohen's d for unpaired comparison
@@ -547,7 +553,9 @@ n <- length(data)
 SE <- SD / sqrt(n)
 print(SE)
 
-____________________________________________________________________________________________________________________
+```
+
+```{r}
 #ACC
 
 # Calculate Cohen's d for unpaired comparison
@@ -614,7 +622,3 @@ print(SD)
 
 
 ```
-```{r cars}
-summary(cars)
-```
-
