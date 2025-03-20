@@ -1,0 +1,129 @@
+---
+title: "Mixed_Effect_Models_all_possibilities"
+output: html_document
+date: "2025-02-21"
+---
+
+```{r}
+library(dplyr)
+library(nlme)
+library(lm.beta)
+library(effectsize)
+library(broom.mixed)
+
+data=read.csv('BITS_Data_Incorrect_SIR_RemoveHC_Other_Study_Demographics.csv')
+
+# Define brain regions
+regions <- c("Right_Insula", "Left_Insula", "ACC")
+
+# Removing eventual duplicates from the data
+data <- data %>%
+  distinct()
+
+# Convert data to have a standard format
+data$Race <- gsub("White, Other", "Other", data$Race)
+data$Race <- gsub("Asian, White", "Other", data$Race)
+data$Race <- gsub("More_than_one_race", "Other", data$Race)
+data$Race[is.na(data$Race)] <- "Other"
+
+
+# Generate numerical columns for Race and Site 
+data$Race_factor <- as.factor(factor(data$Race))
+data$Site_factor <- as.factor(factor(data$Site))
+data$Female0_Male1 <- as.factor(factor(data$Female0_Male1))
+data$PreBITS0_PostBITS1 <- as.factor(data$PreBITS0_PostBITS1)
+data$Race_factor <- relevel(data$Race_factor, ref = "White")
+
+# generate a numerical column with three levels for the Group covariant
+data <- data %>%
+  mutate(Group_numeric = case_when(
+    HD1 == 0 & PreBITS0_PostBITS1 == 0 ~ 0,  # HCs
+    HD1 == 1 & PreBITS0_PostBITS1 == 0 ~ 1,  # Pre BITS
+    HD1 == 1 & PreBITS0_PostBITS1 == 1 ~ 2   # Post BITS
+  ))
+
+data$Group_factor <- as.factor(factor(data$Group_numeric))
+
+# Eliminate HCs data: subset the dataset to have only HD data for the HD only model when looking for the treatment effect
+data_HD = data[data$HD1 == 1,]
+# remove subjects without observations at both timepoints
+PostHD_data <- data[data$HD1 == 1 & data$PreBITS0_PostBITS1 == 1, ]
+subjectsPost=PostHD_data$subject
+data_HD = data_HD[data_HD$subject %in% subjectsPost, ]
+
+# initialize a list to store the results
+all_results <- list()
+```
+
+FIRST MODEL-ONLY HD PRE-HARMONIZATION DATA EXCLUDING GROUP AND SITE CONFOUNDS
+Mixed Model Pre Harmonized data (Only HD data)
+```{r}
+# iterate over the brain region columns
+for (region in regions) {
+  # declare the formula of the mixed effect
+  model <- as.formula(paste0(region, "~ PreBITS0_PostBITS1 + FD + Age + Female0_Male1 + Race_factor"))
+  
+  # fit the model
+  fit_lme <- lme(model, random = ~ 1 | subject, data = data_HD) # use the dataframe with only HD data
+  
+  ##### IF NEEDED #####
+  # Print structure for debugging
+  # str(data)
+  
+  # Print summary for reference
+  print(paste0("Region: ",region))
+  print(summary(fit_lme))  
+  print(tidy(fit_lme))
+  
+  # Save results in a table
+    results <- data.frame(
+      Region = region,
+      ModelName = "Mixed Model Pre Harmonized data (Only HD data)",
+      ModelSummary = tidy(fit_lme)
+    )
+    
+    print(results)
+    # add results to the list
+    all_results <- append(all_results, list(results))
+}
+```
+SECOND MODEL-ALL HARMONIZED DATA EXCLUDING THE TREATMENT CONFOUND
+Mixed Model with All post Harmonization data
+```{r}
+# iterate over the brain region columns
+for (region in regions) {
+  # declare the formula of the mixed effect
+  model <- as.formula(paste0(region, "_harmonized ~ HD1  + FD_harmonized + Age + Female0_Male1 + Race_factor"))
+  
+  # fit the model
+  fit_lme <- lme(model, random = ~ 1 | subject, data = data)   #"data" because is all data (including HCs)
+  
+  ##### IF NEEDED #####
+  # Print structure for debugging
+  # str(data)
+  
+  # Print summary for reference
+  print(paste0("Region: ",region))
+  print(summary(fit_lme))
+  print(tidy(fit_lme))
+
+  
+  # Save results in a table
+    results <- data.frame(
+      Region = region,
+      ModelName = "Mixed Model with All post Harmonization data",
+      ModelSummary = tidy(fit_lme)
+    )
+    
+    print(results)
+    # add results to the list
+    all_results <- append(all_results, list(results))
+}
+```
+```{r}
+# Combine all results into one data frame and transpose
+final_results <- bind_rows(all_results) %>% t() %>% as.data.frame()
+
+# Save the transposed results to a CSV file
+write.csv(final_results, file = 'Mixed_Effect_Models_Result_two_models_definitive.csv', row.names = TRUE)
+```
